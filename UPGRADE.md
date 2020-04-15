@@ -8,7 +8,7 @@ Upgrading in general is as simple as updating your dependency in your composer.j
 running `composer update`. In a big application however there may be more things to consider,
 which are explained in the following.
 
-Upgrade from aksafan/composer-changelog 0.0.1
+Upgrade from aksafan/composer-changelog 1.0.0
 -----------------------
 
 * Initial comments

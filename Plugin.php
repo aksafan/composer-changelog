@@ -109,10 +109,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                         $io->write(PHP_EOL . '  ' . trim(implode(PHP_EOL . ' ', $notes)));
                     }
                 }
-                $io->write(PHP_EOL . '  You can find the upgrade notes for all versions online at:');
+                $io->write(PHP_EOL . '  You can find the upgrade notes for all versions online at: ');
             } else {
                 $this->printUpgradeIntro($io, $packageInfo);
-                $io->write(PHP_EOL . '  You can find the upgrade notes online at:');
+                $io->write(PHP_EOL . '  You can find the upgrade notes online at: ');
             }
             $io->write($packageInfo['sourceUrl']);
         }
@@ -127,7 +127,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     private function printUpgradeIntro(IOInterface $io, array $package): void
     {
         $io->write(PHP_EOL . '  <fg=yellow;options=bold>Seems you have '
-            . ($package['direction'] === 'up' ? 'upgraded' : 'downgraded')
+            . ((string) $package['direction'] === 'up' ? 'upgraded ' : 'downgraded ')
             . $package['namePretty'] . ' from version '
             . $package['fromPretty'] . ' to ' . $package['toPretty'] . '.</>'
         );
@@ -203,8 +203,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                 if ($matches[2] === $fromVersion) {
                     $foundExactMatch = true;
                 }
-                if (version_compare($matches[2], $fromVersion, '<') && ($foundExactMatch || version_compare($matches[2],
-                            $fromVersionMajor, '<'))) {
+                if (
+                    version_compare($matches[2], $fromVersion, '<')
+                    && ($foundExactMatch || version_compare($matches[2], $fromVersionMajor, '<'))
+                ) {
                     break;
                 }
                 $consuming = true;
