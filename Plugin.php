@@ -109,10 +109,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                         $io->write(PHP_EOL . '  ' . trim(implode(PHP_EOL . ' ', $notes)));
                     }
                 }
-                $io->write(PHP_EOL . '  You can find the upgrade notes for all versions online at: ');
+                $io->write(PHP_EOL . '  You can find the upgrade notes for all versions online at: ', false);
             } else {
                 $this->printUpgradeIntro($io, $packageInfo);
-                $io->write(PHP_EOL . '  You can find the upgrade notes online at: ');
+                $io->write(PHP_EOL . '  You can find the upgrade notes online at: ', false);
             }
             $io->write($packageInfo['sourceUrl']);
         }

@@ -33,7 +33,7 @@ Usage
 To use this extension you need to create `UPGRADE.md` file in the root directory of your project with text like the following for every new release you want to show messages about:
 
 ```md
-Upgrade from aksafan/composer-changelog 0.0.1
+Upgrade from ComposerChangelog 1.0.0
 -----------------------
 
 * Initial comments
@@ -42,7 +42,7 @@ Upgrade from aksafan/composer-changelog 0.0.1
 
 There are 3 main parts of every release changelog message (separated with one empty space):
 1) the `Upgrade from `;
-2) package name `aksafan/composer-changelog`;
+2) package name with one word `ComposerChangelog`;
 3) version `0.0.1` (according to [semver](https://semver.org/))
 
 And under this main message you can wrote down all necessary upgrade notes.
