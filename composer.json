@@ -1,0 +1,29 @@
+{
+    "name": "aksafan/composer-changelog",
+    "description": "The composer plugin to show changelog after updating packages through composer",
+    "keywords": ["composer", "changelog"],
+    "type": "composer-plugin",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Anton Khainak",
+            "email": "khainak.anton@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "composer-plugin-api": "^1.0"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "aksafan\\composer\\changelog\\": ""
+        }
+    },
+    "extra": {
+        "class": "aksafan\\composer\\changelog\\Plugin"
+    },
+    "require-dev": {
+        "composer/composer": "^1.10"
+    }
+}
