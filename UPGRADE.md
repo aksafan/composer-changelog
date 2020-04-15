@@ -8,7 +8,17 @@ Upgrading in general is as simple as updating your dependency in your composer.j
 running `composer update`. In a big application however there may be more things to consider,
 which are explained in the following.
 
+Upgrade from ComposerChangelog 1.0.2
+-----------------------
+
+* Initial comments 1.0.2
+
+Upgrade from ComposerChangelog 1.0.1
+-----------------------
+
+* Initial comments 1.0.1
+
 Upgrade from ComposerChangelog 1.0.0
 -----------------------
 
-* Initial comments
+* Initial comments 1.0.0
