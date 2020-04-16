@@ -11,14 +11,17 @@ which are explained in the following.
 Upgrade from ComposerChangelog 1.0.2
 -----------------------
 
-* Initial comments 1.0.2
+* Initial comments for upgrading from v1.0.2
+* Initial comments for upgrading from v1.0.2
 
 Upgrade from ComposerChangelog 1.0.1
 -----------------------
 
-* Initial comments 1.0.1
+* Initial comments for upgrading from v1.0.1
+* Initial comments for upgrading from v1.0.1
 
 Upgrade from ComposerChangelog 1.0.0
 -----------------------
 
-* Initial comments 1.0.0
+* Initial comments for upgrading from v1.0.0
+* Initial comments for upgrading from v1.0.0
