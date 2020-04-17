@@ -95,7 +95,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             // - only if the "from" version is non-dev, otherwise we have no idea which notes to show.
             if ((string) $packageInfo['direction'] === 'up' && $this->isNumericVersion((string) $packageInfo['fromPretty'])) {
                 $notes = $this->findUpgradeNotes((string) $packageName, (string) $packageInfo['fromPretty']);
-                if (null === $notes) {
+                if (! $notes) {
                     // No relevant upgrade notes, do not show anything skipping.
                     continue;
                 }
