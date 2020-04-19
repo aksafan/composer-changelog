@@ -83,13 +83,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function showUpgradeNotes(Script\Event $event)
     {
+        $io = $event->getIO();
         foreach ($this->packageUpdates as $packageName => $packageInfo) {
             // Do not show a notice on up/downgrades between dev versions. Avoid messages like from version dev-master to dev-master.
             if ((string) $packageInfo['fromPretty'] === (string) $packageInfo['toPretty']) {
                 continue;
             }
 
-            $io = $event->getIO();
             // Print the relevant upgrade notes for the upgrade:
             // - only on upgrade, not on downgrade;
             // - only if the "from" version is non-dev, otherwise we have no idea which notes to show.
