@@ -2,7 +2,7 @@
     <a href="https://getcomposer.org/" target="_blank" rel="external">
         <img src="https://getcomposer.org/img/logo-composer-transparent.png" height="178px">
     </a>
-    <h1 align="center">Yii 2 Composer Installer</h1>
+    <h1 align="center">Composer Changelog</h1>
     <br>
 </p>
 
