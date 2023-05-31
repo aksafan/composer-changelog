@@ -13,6 +13,7 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script;
 use Composer\Script\ScriptEvents;
+
 use function file_get_contents;
 use function is_file;
 use function is_readable;
@@ -21,21 +22,34 @@ use function preg_split;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
-    /** @var $packageUpdates array Noted package updates */
-    private $packageUpdates = [];
+    private const DELIMITER = '/';
 
-    /** @var $vendorDir string Path to the vendor directory */
-    private $vendorDir;
+    private const UPGRADE_FILE_NAME = 'UPGRADE.md';
+
+    private const NOTES_LIMIT = 250;
+
+    private const NOTES_LIMIT_ERROR_MESSAGE = '  <fg=yellow;options=bold>The relevant notes for your upgrade are too long to be displayed here.</>';
+
+    /**
+     * @var $packageUpdates array Noted package updates
+     */
+    private array $packageUpdates = [];
+
+    /**
+     * @var $vendorDir string Path to the vendor directory
+     */
+    private string $vendorDir;
 
     /**
      * Apply plugin modifications to Composer
      *
-     * @param Composer    $composer
+     * @param Composer $composer
      * @param IOInterface $io
+     * @return void
      */
-    public function activate(Composer $composer, IOInterface $io)
+    public function activate(Composer $composer, IOInterface $io): void
     {
-        $this->vendorDir = rtrim($composer->getConfig()->get('vendor-dir'), '/');
+        $this->vendorDir = rtrim($composer->getConfig()->get('vendor-dir'), self::DELIMITER);
     }
 
     /**
@@ -55,8 +69,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * Listens to PackageEvents::POST_PACKAGE_UPDATE event and takes note of the package updates.
      *
      * @param PackageEvent $event
+     * @return void
      */
-    public function checkPackageUpdates(PackageEvent $event)
+    public function checkPackageUpdates(PackageEvent $event): void
     {
         $operation = $event->getOperation();
         if ($operation instanceof UpdateOperation) {
@@ -80,8 +95,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * Listens to ScriptEvents::POST_UPDATE_CMD event to display information about upgrade notes if appropriate.
      *
      * @param Script\Event $event
+     * @return void
      */
-    public function showUpgradeNotes(Script\Event $event)
+    public function showUpgradeNotes(Script\Event $event): void
     {
         $io = $event->getIO();
         foreach ($this->packageUpdates as $packageName => $packageInfo) {
@@ -93,22 +109,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             // Print the relevant upgrade notes for the upgrade:
             // - only on upgrade, not on downgrade;
             // - only if the "from" version is non-dev, otherwise we have no idea which notes to show.
-            if ((string) $packageInfo['direction'] === 'up' && $this->isNumericVersion((string) $packageInfo['fromPretty'])) {
+            $isNumericVersion = $this->isNumericVersion((string) $packageInfo['fromPretty']);
+            if ((string) $packageInfo['direction'] === 'up' && $isNumericVersion) {
                 $notes = $this->findUpgradeNotes((string) $packageName, (string) $packageInfo['fromPretty']);
-                if (! $notes) {
+                if (!$notes) {
                     // No relevant upgrade notes, do not show anything skipping.
                     continue;
                 }
 
                 $this->printUpgradeIntro($io, $packageInfo);
-                if ($notes) {
-                    // safety check: do not display notes if they are too many
-                    if (count($notes) > 250) {
-                        $io->write(PHP_EOL . '  <fg=yellow;options=bold>The relevant notes for your upgrade are too long to be displayed here.</>');
-                    } else {
-                        $io->write(PHP_EOL . '  ' . trim(implode(PHP_EOL . ' ', $notes)));
-                    }
-                }
+                $this->checkNotesLimit($notes, $io);
                 $io->write(PHP_EOL . '  You can find the upgrade notes for all versions online at: ', false);
             } else {
                 $this->printUpgradeIntro($io, $packageInfo);
@@ -119,10 +129,43 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
+     * Was added to support composer-plugin-api v2+
+     *
+     * Remove any hooks from Composer
+     *
+     * This will be called when a plugin is deactivated before being
+     * uninstalled, but also before it gets upgraded to a new version
+     * so the old one can be deactivated and the new one activated.
+     *
+     * @param Composer $composer
+     * @param IOInterface $io
+     * @return void
+     */
+    public function deactivate(Composer $composer, IOInterface $io): void
+    {
+    }
+
+    /**
+     * Was added to support composer-plugin-api v2+
+     *
+     * Prepare the plugin to be uninstalled
+     *
+     * This will be called after deactivate.
+     *
+     * @param Composer $composer
+     * @param IOInterface $io
+     * @return void
+     */
+    public function uninstall(Composer $composer, IOInterface $io): void
+    {
+    }
+
+    /**
      * Prints upgrade intro
      *
      * @param IOInterface $io
      * @param array $package
+     * @return void
      */
     private function printUpgradeIntro(IOInterface $io, array $package): void
     {
@@ -144,12 +187,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     private function findUpgradeNotes(string $packageName, string $fromVersion): ?array
     {
-        $upgradeFile = $this->vendorDir . '/' . $packageName . '/UPGRADE.md';
-        if (! is_file($upgradeFile) || ! is_readable($upgradeFile)) {
+        $upgradeFile = $this->vendorDir . self::DELIMITER . $packageName . self::DELIMITER . self::UPGRADE_FILE_NAME;
+        if (!is_file($upgradeFile) || !is_readable($upgradeFile)) {
             return null;
         }
         $lines = preg_split('~\R~', file_get_contents($upgradeFile));
-        if (! $lines) {
+        if ($lines) {
             return null;
         }
 
@@ -217,5 +260,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
 
         return $relevantLines;
+    }
+
+    /**
+     * Makes safety check: do not display notes if they are too many
+     *
+     * @param array $notes
+     * @param IOInterface $io
+     * @return void
+     */
+    private function checkNotesLimit(array $notes, IOInterface $io): void
+    {
+        if (count($notes) > self::NOTES_LIMIT) {
+            $io->write(PHP_EOL . self::NOTES_LIMIT_ERROR_MESSAGE);
+        } else {
+            $io->write(PHP_EOL . '  ' . trim(implode(PHP_EOL . ' ', $notes)));
+        }
     }
 }
