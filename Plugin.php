@@ -10,6 +10,7 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
+use Composer\Package\Version\VersionParser;
 use Composer\Plugin\PluginInterface;
 use Composer\Script;
 use Composer\Script\ScriptEvents;
@@ -82,10 +83,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                 'fromPretty' => $operation->getInitialPackage()->getPrettyVersion(),
                 'to' => $operation->getTargetPackage()->getVersion(),
                 'toPretty' => $operation->getTargetPackage()->getPrettyVersion(),
-                'direction' => $event->getPolicy()->versionCompare(
-                    $operation->getInitialPackage(),
-                    $operation->getTargetPackage(),
-                    '<'
+                'direction' => VersionParser::isUpgrade(
+                    $operation->getInitialPackage()->getVersion(),
+                    $operation->getTargetPackage()->getVersion()
                 ) ? 'up' : 'down',
             ];
         }
