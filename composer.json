@@ -24,6 +24,6 @@
         "class": "aksafan\\composer\\changelog\\Plugin"
     },
     "require-dev": {
-        "composer/composer": "^1.10"
+        "composer/composer": ">=1.10.23 <2.0.0"
     }
 }
